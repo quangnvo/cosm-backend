@@ -1,14 +1,10 @@
 import { Router } from "express";
+import { loginValidator } from "~/middlewares/users.middlewares";
 
 const usersRouter = Router();
 
-usersRouter.use((req, res, next) => {
-  console.log("Time: ", Date.now());
-  next();
-});
-
-usersRouter.get("/tweet", (req, res) => {
-  res.send("Hello aaaaaa!");
+usersRouter.post("/login", loginValidator, (req, res) => {
+  res.json({ message: "Login success" });
 });
 
 export default usersRouter;
