@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { checkSchema } from "express-validator";
 
+// Login validator
 export const loginValidator = (
   req: Request,
   res: Response,
@@ -13,6 +14,7 @@ export const loginValidator = (
   next();
 };
 
+// Register validator
 export const registerValidator = checkSchema({
   name: {
     notEmpty: true,
