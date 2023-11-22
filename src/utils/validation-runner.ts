@@ -19,6 +19,6 @@ export const validate = (
       return next();
     }
 
-    res.status(400).json({ errors: errors.array() });
+    res.status(400).json({ errors: errors.mapped() });
   };
 };
