@@ -1,20 +1,20 @@
-import express from "express";
-import { body, validationResult, ContextRunner } from "express-validator";
-// can be reused by many routes
+import { Request, Response, NextFunction } from "express";
+import {
+  validationResult,
+  ContextRunner,
+  ValidationChain,
+} from "express-validator";
+import { RunnableValidationChains } from "express-validator/src/middlewares/schema";
 
-// sequential processing, stops running validations chain if the previous one fails.
-export const validate = (validations: ContextRunner[]) => {
-  return async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    for (let validation of validations) {
-      const result = await validation.run(req);
-      if (result.errors.length) break;
-    }
-
+// Sequential processing, stops running validations chain if the previous one fails.
+export const validate = (
+  validation: RunnableValidationChains<ValidationChain>
+) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    await validation.run(req);
     const errors = validationResult(req);
+
+    // If there are no errors, continue to the next middleware
     if (errors.isEmpty()) {
       return next();
     }
