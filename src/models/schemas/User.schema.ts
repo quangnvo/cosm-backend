@@ -26,7 +26,7 @@ interface UserType {
   cover_photo: string;
 }
 
-class User {
+export class User {
   _id: ObjectId;
   name: string;
   email: string;

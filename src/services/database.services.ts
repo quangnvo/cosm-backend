@@ -1,4 +1,6 @@
-import { MongoClient, Db } from "mongodb";
+import { MongoClient, Db, Collection } from "mongodb";
+import { User } from "~/models/schemas/User.schema";
+
 import { config } from "dotenv";
 config();
 
@@ -27,8 +29,8 @@ class DatabaseService {
   };
 
   // Create a getter to get the collection users
-  get users() {
-    return this.db.collection("users");
+  get users(): Collection<User> {
+    return this.db.collection(process.env.DB_COLLECTION_USERS || "users");
   }
 }
 
