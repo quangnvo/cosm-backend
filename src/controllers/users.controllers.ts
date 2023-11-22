@@ -19,6 +19,7 @@ export const registerController = async (req: Request, res: Response) => {
         password,
       })
     );
+    console.log("result nè: ", result);
 
     return res.json({ message: "Register success" });
   } catch (error) {
