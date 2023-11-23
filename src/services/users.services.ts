@@ -18,6 +18,9 @@ class UsersService {
         user_id,
         token_type: TokenType.AccessToken,
       },
+      options: {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRE_IN,
+      },
     });
   };
 
@@ -27,6 +30,9 @@ class UsersService {
       payload: {
         user_id,
         token_type: TokenType.RefreshToken,
+      },
+      options: {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE_IN,
       },
     });
   };
