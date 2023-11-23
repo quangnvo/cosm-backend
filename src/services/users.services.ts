@@ -5,6 +5,12 @@ import { hashPassword } from "~/utils/crypto";
 import { signToken } from "~/utils/jwt";
 import { TokenType } from "~/constants/enums";
 class UsersService {
+  // ----- Check email exists -----
+  checkEmailExists = async (email: string) => {
+    const user = await databaseService.users.findOne({ email });
+    return Boolean(user);
+  };
+
   // ----- Sign AccessToken -----
   private signAccessToken = (user_id: string) => {
     return signToken({
@@ -34,13 +40,16 @@ class UsersService {
         password: hashPassword(payload.password),
       })
     );
-    return result;
-  };
+    const user_id = result.insertedId?.toString();
+    const [accessToken, refreshToken] = await Promise.all([
+      this.signAccessToken(user_id as string),
+      this.signRefreshToken(user_id as string),
+    ]);
 
-  // ----- Check email exists -----
-  checkEmailExists = async (email: string) => {
-    const user = await databaseService.users.findOne({ email });
-    return Boolean(user);
+    return {
+      accessToken,
+      refreshToken,
+    };
   };
 }
 
