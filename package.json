@@ -26,6 +26,7 @@
     "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.5",
     "typescript": "^5.2.2"
   }
 }
