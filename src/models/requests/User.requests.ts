@@ -3,5 +3,5 @@ export interface RegisterReqBodyType {
   email: string;
   password: string;
   password_confirm: string;
-  date_of_birth: Date;
+  date_of_birth: string;
 }

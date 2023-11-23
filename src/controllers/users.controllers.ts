@@ -16,10 +16,8 @@ export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterReqBodyType>,
   res: Response
 ) => {
-  const { email, password } = req.body;
-
   try {
-    const result = await usersService.register({ email, password });
+    const result = await usersService.register(req.body);
 
     return res.json({ message: "Register success", result });
   } catch (error) {
