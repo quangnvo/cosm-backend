@@ -32,4 +32,10 @@ export const USERS_MESSAGES = {
 
   // Date of birth
   DATE_OF_BIRTH_MUST_BE_ISO8601: "Date of birth must be ISO8601",
+
+  // Login
+  LOGIN_SUCCESS: "Login success",
+
+  // Register
+  REGISTER_SUCCESS: "Register success",
 } as const;
