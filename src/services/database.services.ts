@@ -2,6 +2,7 @@ import { MongoClient, Db, Collection } from "mongodb";
 import { User } from "~/models/schemas/User.schema";
 
 import { config } from "dotenv";
+import { RefreshToken } from "~/models/schemas/RefreshToken.scheman";
 config();
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.ilof1da.mongodb.net/?retryWrites=true&w=majority`;
@@ -32,6 +33,12 @@ class DatabaseService {
   // Create a getter to get the collection users
   get users(): Collection<User> {
     return this.db.collection(process.env.DB_COLLECTION_USERS || "users");
+  }
+
+  get refreshToken(): Collection<RefreshToken> {
+    return this.db.collection(
+      process.env.DB_COLLECTION_REFRESH_TOKENS || "refresh_tokens"
+    );
   }
 }
 

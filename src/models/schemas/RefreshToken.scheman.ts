@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 interface RefreshTokenType {
-  _id: ObjectId;
+  _id?: ObjectId;
   token: string;
   created_at?: Date;
   user_id: ObjectId;

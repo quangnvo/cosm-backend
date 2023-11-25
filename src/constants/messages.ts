@@ -11,7 +11,7 @@ export const USERS_MESSAGES = {
   EMAIL_ALREADY_EXISTS: "Email already exists",
   EMAIL_IS_REQUIRED: "Email is required",
   EMAIL_IS_INVALID: "Email is invalid",
-  USER_NOT_FOUND: "User not found",
+  EMAIL_OR_PASSWORD_IS_INCORRECT: "Email or password is incorrect",
 
   // Password
   PASSWORD_IS_REQUIRED: "Password is required",
@@ -38,4 +38,7 @@ export const USERS_MESSAGES = {
 
   // Register
   REGISTER_SUCCESS: "Register success",
+
+  // Access token
+  ACCESS_TOKEN_IS_REQUIRED: "Access token is required",
 } as const;

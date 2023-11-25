@@ -1,4 +1,7 @@
 import jwt, { SignOptions } from "jsonwebtoken";
+import { config } from "dotenv";
+
+config();
 
 interface SignTokenType {
   payload: string | object | Buffer;

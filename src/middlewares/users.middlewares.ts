@@ -7,178 +7,206 @@ import { hashPassword } from "~/utils/crypto";
 
 // ----- Login validator -----
 export const loginValidator = validate(
-  checkSchema({
-    // Email
-    email: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED,
-      },
-      isEmail: {
-        errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID,
-      },
-      normalizeEmail: true,
-      trim: true,
-      custom: {
-        options: async (value, { req }) => {
-          // const isExistEmail = await usersService.checkEmailExists(value);
-          const user = await databaseService.users.findOne({
-            email: value,
-            password: hashPassword(req.body.password),
-          });
-          if (user === null) {
-            throw new Error(USERS_MESSAGES.USER_NOT_FOUND);
-          }
-          req.user = user;
-          return true;
+  checkSchema(
+    {
+      // Email
+      email: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED,
+        },
+        isEmail: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID,
+        },
+        normalizeEmail: true,
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            // const isExistEmail = await usersService.checkEmailExists(value);
+            const user = await databaseService.users.findOne({
+              email: value,
+              password: hashPassword(req.body.password),
+            });
+            if (user === null) {
+              throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT);
+            }
+            req.user = user;
+            return true;
+          },
         },
       },
-    },
 
-    // Password
-    password: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED,
-      },
-      isString: {
-        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING,
-      },
-      isLength: {
-        options: {
-          min: 6,
-          max: 50,
+      // Password
+      password: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED,
         },
-        errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_BETWEEN_6_AND_50,
-      },
-      isStrongPassword: {
-        options: {
-          minLength: 6,
-          minSymbols: 1,
-          minNumbers: 1,
-          minUppercase: 1,
-          minLowercase: 1,
+        isString: {
+          errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING,
         },
-        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRONG,
+        isLength: {
+          options: {
+            min: 6,
+            max: 50,
+          },
+          errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_BETWEEN_6_AND_50,
+        },
+        isStrongPassword: {
+          options: {
+            minLength: 6,
+            minSymbols: 1,
+            minNumbers: 1,
+            minUppercase: 1,
+            minLowercase: 1,
+          },
+          errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRONG,
+        },
       },
     },
-  })
+    ["body"]
+  )
 );
 
 // ----- Register validator -----
 export const registerValidator = validate(
-  checkSchema({
-    // Name
-    name: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.NAME_IS_REQUIRED,
-      },
-      isString: {
-        errorMessage: USERS_MESSAGES.NAME_MUST_BE_STRING,
-      },
-      isLength: {
-        options: {
-          min: 1,
-          max: 255,
+  checkSchema(
+    {
+      // Name
+      name: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.NAME_IS_REQUIRED,
         },
-        errorMessage: USERS_MESSAGES.NAME_LENGTH_MUST_BE_BETWEEN_1_AND_255,
+        isString: {
+          errorMessage: USERS_MESSAGES.NAME_MUST_BE_STRING,
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 255,
+          },
+          errorMessage: USERS_MESSAGES.NAME_LENGTH_MUST_BE_BETWEEN_1_AND_255,
+        },
+        trim: true,
       },
-      trim: true,
+
+      // Email
+      email: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED,
+        },
+        isEmail: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID,
+        },
+        normalizeEmail: true,
+        trim: true,
+        custom: {
+          options: async (value) => {
+            const isExistEmail = await usersService.checkEmailExists(value);
+            if (isExistEmail) {
+              throw new Error(USERS_MESSAGES.EMAIL_ALREADY_EXISTS);
+            }
+            return true;
+          },
+        },
+      },
+
+      // Password
+      password: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED,
+        },
+        isString: {
+          errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING,
+        },
+        isLength: {
+          options: {
+            min: 6,
+            max: 50,
+          },
+          errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_BETWEEN_6_AND_50,
+        },
+        isStrongPassword: {
+          options: {
+            minLength: 6,
+            minSymbols: 1,
+            minNumbers: 1,
+            minUppercase: 1,
+            minLowercase: 1,
+          },
+          errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRONG,
+        },
+      },
+
+      // Password confirm
+      password_confirm: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.PASSWORD_CONFIRM_IS_REQUIRED,
+        },
+        isString: {
+          errorMessage: USERS_MESSAGES.PASSWORD_CONFIRM_MUST_BE_STRING,
+        },
+
+        isLength: {
+          options: {
+            min: 6,
+            max: 50,
+          },
+          errorMessage:
+            USERS_MESSAGES.PASSWORD_CONFIRM_LENGTH_MUST_BE_BETWEEN_6_AND_50,
+        },
+        isStrongPassword: {
+          options: {
+            minLength: 6,
+            minSymbols: 1,
+            minNumbers: 1,
+            minUppercase: 1,
+            minLowercase: 1,
+          },
+          errorMessage: USERS_MESSAGES.PASSWORD_CONFIRM_MUST_BE_STRONG,
+        },
+
+        custom: {
+          options: (value, { req }) => {
+            if (value !== req.body.password) {
+              throw new Error(USERS_MESSAGES.PASSWORD_NOT_MATCH);
+            }
+            return true;
+          },
+        },
+      },
+
+      // Date of birth
+      date_of_birth: {
+        isISO8601: {
+          options: {
+            strict: true,
+            strictSeparator: true,
+          },
+          errorMessage: USERS_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601,
+        },
+      },
     },
+    ["body"]
+  )
+);
 
-    // Email
-    email: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED,
-      },
-      isEmail: {
-        errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID,
-      },
-      normalizeEmail: true,
-      trim: true,
-      custom: {
-        options: async (value) => {
-          const isExistEmail = await usersService.checkEmailExists(value);
-          if (isExistEmail) {
-            throw new Error(USERS_MESSAGES.EMAIL_ALREADY_EXISTS);
-          }
-          return true;
+// ----- Access Token validator -----
+export const accessTokenValidator = validate(
+  checkSchema(
+    {
+      Authorization: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const accessToken = value.replace("Bearer ", "");
+            if (accessToken === "") {
+              throw new Error(USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED);
+            }
+          },
         },
       },
     },
-
-    // Password
-    password: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED,
-      },
-      isString: {
-        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING,
-      },
-      isLength: {
-        options: {
-          min: 6,
-          max: 50,
-        },
-        errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_BETWEEN_6_AND_50,
-      },
-      isStrongPassword: {
-        options: {
-          minLength: 6,
-          minSymbols: 1,
-          minNumbers: 1,
-          minUppercase: 1,
-          minLowercase: 1,
-        },
-        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRONG,
-      },
-    },
-
-    // Password confirm
-    password_confirm: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.PASSWORD_CONFIRM_IS_REQUIRED,
-      },
-      isString: {
-        errorMessage: USERS_MESSAGES.PASSWORD_CONFIRM_MUST_BE_STRING,
-      },
-
-      isLength: {
-        options: {
-          min: 6,
-          max: 50,
-        },
-        errorMessage:
-          USERS_MESSAGES.PASSWORD_CONFIRM_LENGTH_MUST_BE_BETWEEN_6_AND_50,
-      },
-      isStrongPassword: {
-        options: {
-          minLength: 6,
-          minSymbols: 1,
-          minNumbers: 1,
-          minUppercase: 1,
-          minLowercase: 1,
-        },
-        errorMessage: USERS_MESSAGES.PASSWORD_CONFIRM_MUST_BE_STRONG,
-      },
-
-      custom: {
-        options: (value, { req }) => {
-          if (value !== req.body.password) {
-            throw new Error(USERS_MESSAGES.PASSWORD_NOT_MATCH);
-          }
-          return true;
-        },
-      },
-    },
-
-    // Date of birth
-    date_of_birth: {
-      isISO8601: {
-        options: {
-          strict: true,
-          strictSeparator: true,
-        },
-        errorMessage: USERS_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601,
-      },
-    },
-  })
+    ["headers"]
+  )
 );

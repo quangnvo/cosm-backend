@@ -4,6 +4,11 @@ import { RegisterReqBodyType } from "~/models/requests/User.requests";
 import { hashPassword } from "~/utils/crypto";
 import { signToken } from "~/utils/jwt";
 import { TokenType } from "~/constants/enums";
+import { RefreshToken } from "~/models/schemas/RefreshToken.scheman";
+import { ObjectId } from "mongodb";
+import { config } from "dotenv";
+
+config();
 class UsersService {
   // ----- Check email exists -----
   checkEmailExists = async (email: string) => {
@@ -58,6 +63,9 @@ class UsersService {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
       user_id!
     );
+    await databaseService.refreshToken.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
+    );
     return {
       accessToken,
       refreshToken,
@@ -68,6 +76,9 @@ class UsersService {
   login = async (user_id: string) => {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
       user_id
+    );
+    await databaseService.refreshToken.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
     );
     return {
       accessToken,

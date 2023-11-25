@@ -10,6 +10,16 @@ import { wrapRequestHandler } from "~/utils/wrap-handlers";
 const usersRouter = Router();
 
 // ----- Login -----
+
+/*
+Description: Login a user
+Route: /users/login
+Methods: POST
+Body: {
+  "email": "string",
+  "password": "string",
+}
+*/
 usersRouter.post("/login", loginValidator, wrapRequestHandler(loginController));
 
 // ----- Register -----
@@ -25,11 +35,20 @@ Body: {
   "date_of_birth": "string",
 }
 */
-
 usersRouter.post(
   "/register",
   registerValidator,
   wrapRequestHandler(registerController)
 );
+
+// ----- Logout -----
+/*
+Description: Logout a user
+Route: /users/logout
+Methods: POST
+Headers: { Authorization: Bearer <access_token> }
+Body: {refresh_token: string}
+*/
+usersRouter.post("/logout");
 
 export default usersRouter;
