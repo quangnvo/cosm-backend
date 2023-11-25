@@ -236,7 +236,16 @@ export const refreshTokenValidator = validate(
         custom: {
           options: async (value: string, { req }) => {
             try {
-              const decoded_refresh_token = await verifyToken({ token: value });
+              const [decoded_refresh_token, refresh_token] = await Promise.all([
+                verifyToken({ token: value }),
+                databaseService.refreshTokens.findOne({ token: value }),
+              ]);
+              if (refresh_token === null) {
+                throw new ErrorWithStatus({
+                  message: USERS_MESSAGES.REFRESH_TOKEN_IS_USED_OR_NOT_EXISTS,
+                  status: HTTP_STATUS.UNAUTHORIZED,
+                });
+              }
               req.decoded_refresh_token = decoded_refresh_token;
             } catch (error) {
               throw new ErrorWithStatus({
