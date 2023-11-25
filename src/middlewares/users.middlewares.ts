@@ -3,7 +3,7 @@ import { checkSchema } from "express-validator";
 import usersService from "~/services/users.services";
 import { validate } from "~/utils/validation-runner";
 
-// Login validator
+// ----- Login validator -----
 export const loginValidator = (
   req: Request,
   res: Response,
@@ -16,7 +16,7 @@ export const loginValidator = (
   next();
 };
 
-// Register validator
+// ----- Register validator -----
 export const registerValidator = validate(
   checkSchema({
     // Name
@@ -42,7 +42,10 @@ export const registerValidator = validate(
         options: async (value) => {
           const isExistEmail = await usersService.checkEmailExists(value);
           if (isExistEmail) {
-            throw new Error("Email already exists");
+            throw {
+              message: "Email already exists",
+              status: 401,
+            };
           }
           return true;
         },

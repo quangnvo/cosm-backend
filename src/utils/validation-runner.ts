@@ -13,12 +13,13 @@ export const validate = (
   return async (req: Request, res: Response, next: NextFunction) => {
     await validation.run(req);
     const errors = validationResult(req);
+    const errrosObject = errors.mapped();
 
     // If there are no errors, continue to the next middleware
     if (errors.isEmpty()) {
       return next();
     }
 
-    res.status(400).json({ errors: errors.mapped() });
+    res.status(422).json({ errors: errrosObject });
   };
 };
