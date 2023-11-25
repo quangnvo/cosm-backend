@@ -5,6 +5,8 @@ import { USERS_MESSAGES } from "~/constants/messages";
 import databaseService from "~/services/database.services";
 import { hashPassword } from "~/utils/crypto";
 import { verifyToken } from "~/utils/jwt";
+import { ErrorWithStatus } from "~/models/Errors";
+import { HTTP_STATUS } from "~/constants/httpStatus";
 
 // ----- Login validator -----
 export const loginValidator = validate(
@@ -200,9 +202,12 @@ export const accessTokenValidator = validate(
         },
         custom: {
           options: async (value: string, { req }) => {
-            const accessToken = value.replace("Bearer ", "");
-            if (accessToken === "") {
-              throw new Error(USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED);
+            const accessToken = value.split(" ")[1];
+            if (!accessToken) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
+                status: HTTP_STATUS.UNAUTHORIZED,
+              });
             }
             const decoded_authorization = await verifyToken({
               token: accessToken,
