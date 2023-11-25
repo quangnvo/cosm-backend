@@ -37,6 +37,14 @@ class UsersService {
     });
   };
 
+  // ----- Sign Access and Refress Token -----
+  private signAccessAndRefreshToken = (user_id: string) => {
+    return Promise.all([
+      this.signAccessToken(user_id as string),
+      this.signRefreshToken(user_id as string),
+    ]);
+  };
+
   // ----- Register -----
   register = async (payload: RegisterReqBodyType) => {
     const result = await databaseService.users.insertOne(
@@ -47,10 +55,21 @@ class UsersService {
       })
     );
     const user_id = result.insertedId?.toString();
-    const [accessToken, refreshToken] = await Promise.all([
-      this.signAccessToken(user_id as string),
-      this.signRefreshToken(user_id as string),
-    ]);
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
+      user_id!
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  };
+
+  // ----- Login -----
+  login = async (user_id: string) => {
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
+      user_id
+    );
 
     return {
       accessToken,

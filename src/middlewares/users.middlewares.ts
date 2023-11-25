@@ -1,22 +1,63 @@
-import { HTTP_STATUS } from "./../constants/httpStatus";
-import { Request, Response, NextFunction } from "express";
 import { checkSchema } from "express-validator";
 import usersService from "~/services/users.services";
 import { validate } from "~/utils/validation-runner";
 import { USERS_MESSAGES } from "~/constants/messages";
+import databaseService from "~/services/database.services";
 
 // ----- Login validator -----
-export const loginValidator = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
-  }
-  next();
-};
+export const loginValidator = validate(
+  checkSchema({
+    // Email
+    email: {
+      notEmpty: {
+        errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED,
+      },
+      isEmail: {
+        errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID,
+      },
+      normalizeEmail: true,
+      trim: true,
+      custom: {
+        options: async (value, { req }) => {
+          // const isExistEmail = await usersService.checkEmailExists(value);
+          const user = await databaseService.users.findOne({ email: value });
+          if (user === null) {
+            throw new Error(USERS_MESSAGES.USER_NOT_FOUND);
+          }
+          req.user = user;
+          return true;
+        },
+      },
+    },
+
+    // Password
+    password: {
+      notEmpty: {
+        errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED,
+      },
+      isString: {
+        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING,
+      },
+      isLength: {
+        options: {
+          min: 6,
+          max: 50,
+        },
+        errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_BETWEEN_6_AND_50,
+      },
+      isStrongPassword: {
+        options: {
+          minLength: 6,
+          minSymbols: 1,
+          minNumbers: 1,
+          minUppercase: 1,
+          minLowercase: 1,
+        },
+        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRONG,
+      },
+    },
+  })
+);
 
 // ----- Register validator -----
 export const registerValidator = validate(
@@ -53,10 +94,6 @@ export const registerValidator = validate(
         options: async (value) => {
           const isExistEmail = await usersService.checkEmailExists(value);
           if (isExistEmail) {
-            // throw new ErrorWithStatus({
-            //   message: "Email already exists",
-            //   status: HTTP_STATUS.CONFLICT,
-            // });
             throw new Error(USERS_MESSAGES.EMAIL_ALREADY_EXISTS);
           }
           return true;
