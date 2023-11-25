@@ -5,7 +5,7 @@ import {
   registerController,
 } from "~/controllers/users.controllers";
 import { registerValidator } from "~/middlewares/users.middlewares";
-import { wrapAsync } from "~/utils/handlers";
+import { wrapRequestHandler } from "~/utils/wrap-handlers";
 
 const usersRouter = Router();
 usersRouter.post("/login", loginValidator, loginController);
@@ -23,6 +23,10 @@ Body: {
 }
 */
 
-usersRouter.post("/register", registerValidator, wrapAsync(registerController));
+usersRouter.post(
+  "/register",
+  registerValidator,
+  wrapRequestHandler(registerController)
+);
 
 export default usersRouter;
