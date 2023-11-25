@@ -58,7 +58,6 @@ class UsersService {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
       user_id!
     );
-
     return {
       accessToken,
       refreshToken,
@@ -70,7 +69,6 @@ class UsersService {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
       user_id
     );
-
     return {
       accessToken,
       refreshToken,

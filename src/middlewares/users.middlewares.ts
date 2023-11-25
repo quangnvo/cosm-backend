@@ -3,6 +3,7 @@ import usersService from "~/services/users.services";
 import { validate } from "~/utils/validation-runner";
 import { USERS_MESSAGES } from "~/constants/messages";
 import databaseService from "~/services/database.services";
+import { hashPassword } from "~/utils/crypto";
 
 // ----- Login validator -----
 export const loginValidator = validate(
@@ -20,7 +21,10 @@ export const loginValidator = validate(
       custom: {
         options: async (value, { req }) => {
           // const isExistEmail = await usersService.checkEmailExists(value);
-          const user = await databaseService.users.findOne({ email: value });
+          const user = await databaseService.users.findOne({
+            email: value,
+            password: hashPassword(req.body.password),
+          });
           if (user === null) {
             throw new Error(USERS_MESSAGES.USER_NOT_FOUND);
           }
