@@ -6,9 +6,6 @@ type ErrorType = Record<
   string,
   {
     msg: string;
-    location: string;
-    path: string;
-    value: any;
     [key: string]: any;
   }
 >;
