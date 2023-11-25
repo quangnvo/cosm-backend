@@ -7,7 +7,6 @@ import { RegisterReqBodyType } from "~/models/requests/User.requests";
 export const loginController = async (req: Request, res: Response) => {
   const { user }: any = req;
   const user_id = user._id;
-  console.log("user_id: ", user_id);
   const result = await usersService.login(user_id.toString());
   return res.json({
     message: "Login success",

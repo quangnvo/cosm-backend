@@ -8,8 +8,11 @@ import { registerValidator } from "~/middlewares/users.middlewares";
 import { wrapRequestHandler } from "~/utils/wrap-handlers";
 
 const usersRouter = Router();
-usersRouter.post("/login", loginValidator, loginController);
 
+// ----- Login -----
+usersRouter.post("/login", loginValidator, wrapRequestHandler(loginController));
+
+// ----- Register -----
 /* 
 Description: Register a new user
 Route: /users/register
