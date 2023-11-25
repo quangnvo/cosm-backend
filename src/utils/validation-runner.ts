@@ -5,6 +5,7 @@ import {
   ValidationChain,
 } from "express-validator";
 import { RunnableValidationChains } from "express-validator/src/middlewares/schema";
+import { ErrorWithStatus } from "~/models/Errors";
 
 // Sequential processing, stops running validations chain if the previous one fails.
 export const validate = (
@@ -15,7 +16,13 @@ export const validate = (
     const errors = validationResult(req);
     const errrosObject = errors.mapped();
 
-    // If there are no errors, continue to the next middleware
+    for (const key in errrosObject) {
+      const { msg } = errrosObject[key];
+      if (msg instanceof ErrorWithStatus && msg.status == 422) {
+        errrosObject[key] = errrosObject[key].msg;
+      }
+    }
+
     if (errors.isEmpty()) {
       return next();
     }
