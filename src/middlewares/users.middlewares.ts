@@ -230,9 +230,20 @@ export const refreshTokenValidator = validate(
         notEmpty: {
           errorMessage: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
         },
+        isString: {
+          errorMessage: USERS_MESSAGES.REFRESH_TOKEN_MUST_BE_STRING,
+        },
         custom: {
           options: async (value: string, { req }) => {
-            const decoded_refresh_token = await verifyToken({ token: value });
+            try {
+              const decoded_refresh_token = await verifyToken({ token: value });
+              req.decoded_refresh_token = decoded_refresh_token;
+            } catch (error) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.REFRESH_TOKEN_IS_INVALID,
+                status: HTTP_STATUS.UNAUTHORIZED,
+              });
+            }
             return true;
           },
         },
