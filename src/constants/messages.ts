@@ -41,4 +41,7 @@ export const USERS_MESSAGES = {
 
   // Access token
   ACCESS_TOKEN_IS_REQUIRED: "Access token is required",
+
+  // Refresh token
+  REFRESH_TOKEN_IS_REQUIRED: "Refresh token is required",
 } as const;

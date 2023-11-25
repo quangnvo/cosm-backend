@@ -221,3 +221,23 @@ export const accessTokenValidator = validate(
     ["headers"]
   )
 );
+
+// ----- Refresh Token validator -----
+export const refreshTokenValidator = validate(
+  checkSchema(
+    {
+      refresh_token: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
+        },
+        custom: {
+          options: async (value: string, { req }) => {
+            const decoded_refresh_token = await verifyToken({ token: value });
+            return true;
+          },
+        },
+      },
+    },
+    ["body"]
+  )
+);

@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 
 import {
   accessTokenValidator,
+  refreshTokenValidator,
   loginValidator,
   registerValidator,
 } from "~/middlewares/users.middlewares";
@@ -58,6 +59,7 @@ Body: {refresh_token: string}
 usersRouter.post(
   "/logout",
   accessTokenValidator,
+  refreshTokenValidator,
   wrapRequestHandler((req: Request, res: Response) => {
     res.json({ message: "Logout successfully!" });
   })
