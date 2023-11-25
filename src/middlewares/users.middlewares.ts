@@ -4,6 +4,7 @@ import { validate } from "~/utils/validation-runner";
 import { USERS_MESSAGES } from "~/constants/messages";
 import databaseService from "~/services/database.services";
 import { hashPassword } from "~/utils/crypto";
+import { verifyToken } from "~/utils/jwt";
 
 // ----- Login validator -----
 export const loginValidator = validate(
@@ -198,11 +199,16 @@ export const accessTokenValidator = validate(
           errorMessage: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
         },
         custom: {
-          options: async (value, { req }) => {
+          options: async (value: string, { req }) => {
             const accessToken = value.replace("Bearer ", "");
             if (accessToken === "") {
               throw new Error(USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED);
             }
+            const decoded_authorization = await verifyToken({
+              token: accessToken,
+            });
+            req.decoded_authorization = decoded_authorization;
+            return true;
           },
         },
       },

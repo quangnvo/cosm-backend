@@ -1,10 +1,16 @@
-import { Router } from "express";
-import { loginValidator } from "~/middlewares/users.middlewares";
+import { Request, Response, Router } from "express";
+
+import {
+  accessTokenValidator,
+  loginValidator,
+  registerValidator,
+} from "~/middlewares/users.middlewares";
+
 import {
   loginController,
   registerController,
 } from "~/controllers/users.controllers";
-import { registerValidator } from "~/middlewares/users.middlewares";
+
 import { wrapRequestHandler } from "~/utils/wrap-handlers";
 
 const usersRouter = Router();
@@ -49,6 +55,12 @@ Methods: POST
 Headers: { Authorization: Bearer <access_token> }
 Body: {refresh_token: string}
 */
-usersRouter.post("/logout");
+usersRouter.post(
+  "/logout",
+  accessTokenValidator,
+  wrapRequestHandler((req: Request, res: Response) => {
+    res.json({ message: "Logout successfully!" });
+  })
+);
 
 export default usersRouter;
