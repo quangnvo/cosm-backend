@@ -6,6 +6,7 @@ import {
 } from "express-validator";
 import { RunnableValidationChains } from "express-validator/src/middlewares/schema";
 import { ErrorWithStatus } from "~/models/Errors";
+import httpStatus from "~/constants/httpStatus";
 
 // Sequential processing, stops running validations chain if the previous one fails.
 export const validate = (
@@ -18,8 +19,11 @@ export const validate = (
 
     for (const key in errrosObject) {
       const { msg } = errrosObject[key];
-      if (msg instanceof ErrorWithStatus && msg.status == 422) {
-        errrosObject[key] = errrosObject[key].msg;
+      if (
+        msg instanceof ErrorWithStatus &&
+        msg.status !== httpStatus.UNPROCESSABLE_ENTITY
+      ) {
+        return next(msg);
       }
     }
 
@@ -27,6 +31,7 @@ export const validate = (
       return next();
     }
 
+    // In this case, no return error here, because we want to return all errors at once. So we will handle it in the index.js.
     res.status(422).json({ errors: errrosObject });
   };
 };
