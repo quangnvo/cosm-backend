@@ -1,4 +1,4 @@
-const httpStatus = {
+export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
   ACCEPTED: 202,
@@ -10,4 +10,3 @@ const httpStatus = {
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER: 500,
 };
-export default httpStatus;

@@ -6,7 +6,7 @@ import {
 } from "express-validator";
 import { RunnableValidationChains } from "express-validator/src/middlewares/schema";
 import { ErrorWithStatus } from "~/models/Errors";
-import httpStatus from "~/constants/httpStatus";
+import { HTTP_STATUS } from "~/constants/httpStatus";
 
 // Sequential processing, stops running validations chain if the previous one fails.
 export const validate = (
@@ -21,7 +21,7 @@ export const validate = (
       const { msg } = errrosObject[key];
       if (
         msg instanceof ErrorWithStatus &&
-        msg.status !== httpStatus.UNPROCESSABLE_ENTITY
+        msg.status !== HTTP_STATUS.UNPROCESSABLE_ENTITY
       ) {
         return next(msg);
       }
