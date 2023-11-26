@@ -7,6 +7,7 @@ import { TokenType } from "~/constants/enums";
 import { RefreshToken } from "~/models/schemas/RefreshToken.scheman";
 import { ObjectId } from "mongodb";
 import { config } from "dotenv";
+import { USERS_MESSAGES } from "~/constants/messages";
 
 config();
 class UsersService {
@@ -63,7 +64,7 @@ class UsersService {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
       user_id!
     );
-    await databaseService.refreshToken.insertOne(
+    await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
     );
     return {
@@ -77,12 +78,20 @@ class UsersService {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(
       user_id
     );
-    await databaseService.refreshToken.insertOne(
+    await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken })
     );
     return {
       accessToken,
       refreshToken,
+    };
+  };
+
+  // ----- Logout -----
+  logout = async (refresh_token: string) => {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token });
+    return {
+      message: USERS_MESSAGES.LOGOUT_SUCCESS,
     };
   };
 }
