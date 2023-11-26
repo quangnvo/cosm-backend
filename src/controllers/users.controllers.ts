@@ -33,3 +33,10 @@ export const registerController = async (
     next(error);
   }
 };
+
+// ----- Logout controller -----
+export const logoutController = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+  const result = await usersService.logout(refreshToken);
+  return res.json(result);
+};
