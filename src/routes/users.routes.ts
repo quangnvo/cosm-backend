@@ -9,6 +9,7 @@ import {
 
 import {
   loginController,
+  logoutController,
   registerController,
 } from "~/controllers/users.controllers";
 
@@ -60,9 +61,7 @@ usersRouter.post(
   "/logout",
   accessTokenValidator,
   refreshTokenValidator,
-  wrapRequestHandler((req: Request, res: Response) => {
-    res.json({ message: "Logout successfully!" });
-  })
+  wrapRequestHandler(logoutController)
 );
 
 export default usersRouter;
