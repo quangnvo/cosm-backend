@@ -7,6 +7,7 @@ import { hashPassword } from "~/utils/crypto";
 import { verifyToken } from "~/utils/jwt";
 import { ErrorWithStatus } from "~/models/Errors";
 import { HTTP_STATUS } from "~/constants/httpStatus";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 // ----- Login validator -----
 export const loginValidator = validate(
@@ -209,10 +210,17 @@ export const accessTokenValidator = validate(
                 status: HTTP_STATUS.UNAUTHORIZED,
               });
             }
-            const decoded_authorization = await verifyToken({
-              token: accessToken,
-            });
-            req.decoded_authorization = decoded_authorization;
+            try {
+              const decoded_authorization = await verifyToken({
+                token: accessToken,
+              });
+              req.decoded_authorization = decoded_authorization;
+            } catch (error: any) {
+              throw new ErrorWithStatus({
+                message: error.message,
+                status: HTTP_STATUS.UNAUTHORIZED,
+              });
+            }
             return true;
           },
         },
@@ -248,10 +256,13 @@ export const refreshTokenValidator = validate(
               }
               req.decoded_refresh_token = decoded_refresh_token;
             } catch (error) {
-              throw new ErrorWithStatus({
-                message: USERS_MESSAGES.REFRESH_TOKEN_IS_INVALID,
-                status: HTTP_STATUS.UNAUTHORIZED,
-              });
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: USERS_MESSAGES.REFRESH_TOKEN_IS_INVALID,
+                  status: HTTP_STATUS.UNAUTHORIZED,
+                });
+              }
+              throw error;
             }
             return true;
           },
