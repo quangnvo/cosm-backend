@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import usersService from "~/services/users.services";
 import { ParamsDictionary } from "express-serve-static-core";
 import { RegisterReqBodyType } from "~/models/requests/User.requests";
-import { ObjectId } from "mongodb";
-import { User } from "~/models/schemas/User.schema";
 import { USERS_MESSAGES } from "~/constants/messages";
 
 // ----- Login controller -----
